@@ -127,22 +127,23 @@ def fitness(lap, t_coord):
     return np.sum( np.sqrt( np.sum( (t_coord - gcoord[permutation])**2, axis=1) ) )/N*N
 
 def new_generation(old_generation, real_coords, elit_rate = ELIT, mutation_rate = MUTATION_RATE, half = HALF, mtype = "strong"):
+    
+    print("old_gen[0]",fitness(old_generation[0],real_coords))
     fit = [fitness(individual, real_coords) for individual in old_generation]
-    idx = np.argsort(fit)
-    print(idx)
-    new_gen = []
+    sorted_gen = [x for y,x in sorted(zip(fit,old_generation))]
+    print("fit sorted_gen[0]",fitness(sorted_gen[0],real_coords))
+    new_gen =[]
     for i in range(n_population):
-        if i < ELIT:
-            new_gen.append(old_generation[idx[i]]) 
+        if i < ELIT: 
+            new_gen.append(sorted_gen[i])
         else: 
-            new_gen.append(crossover(old_generation[idx[np.random.randint(0,n_population)]], old_generation[idx[np.random.randint(0,n_population)]]))
-        
+            new_gen.append(crossover(old_generation[np.random.randint(0,n_population)], old_generation[np.random.randint(0,n_population)]))
+    
     for i in range(n_population):    
         if np.random.rand() < mutation_rate:
             if i > ELIT:
                 new_gen[i] = mutate(new_gen[i],mtype)
     print("new gen")
-    print([fitness(individual, real_coords) for individual in new_gen])
     return new_gen
 
 def GA(real_coords, laplacian, max_iter = max_iter):
